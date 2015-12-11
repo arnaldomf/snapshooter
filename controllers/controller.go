@@ -1,6 +1,10 @@
 package controllers
 
-import "fmt"
+import (
+	"fmt"
+
+	"bitbucket.org/dafiti/snap-shooter/models"
+)
 
 const (
 	errorTag = "Controller"
@@ -15,6 +19,7 @@ type CreateConnectorInput struct {
 // Connector abstract all other connectors
 type Connector interface {
 	Connect() error
+	GetInstancesByName(names []*string) ([]models.Instance, error)
 }
 
 func createAWSConnector(
@@ -32,7 +37,8 @@ func CreateConnector(createConnectorInput *CreateConnectorInput) (Connector, err
 	case "aws":
 		connector = createAWSConnector(createConnectorInput)
 	default:
-		return nil, fmt.Errorf("%s.CreateConnector: %s is not a valid connector\n", errorTag, createConnectorInput.CloudType)
+		return nil, fmt.Errorf("%s.CreateConnector: %s is not a valid connector\n",
+			errorTag, createConnectorInput.CloudType)
 	}
 	return connector, nil
 }
