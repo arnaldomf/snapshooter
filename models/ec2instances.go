@@ -1,6 +1,7 @@
 package models
 
 import "github.com/aws/aws-sdk-go/service/ec2"
+import "strings"
 
 // BlockMapping has the Name (xvda/xvdb...) and the EBS ID
 type BlockMapping struct {
@@ -11,6 +12,8 @@ type BlockMapping struct {
 // EC2Instance holds all information needed to create a snapshot
 type EC2Instance struct {
 	Name          string
+	Domain        string
+	FQDN          string
 	ID            string
 	WindowHour    int
 	BlockMappings []*BlockMapping
@@ -21,7 +24,10 @@ func GetEC2Instance(instance *ec2.Instance) *EC2Instance {
 	ec2Instance := new(EC2Instance)
 	for _, tag := range instance.Tags {
 		if *tag.Key == "Name" {
-			ec2Instance.Name = *tag.Value
+			values := strings.Split(*tag.Value, ".")
+			ec2Instance.Name = values[0]
+			ec2Instance.Domain = strings.Join(values[1:], ".")
+			ec2Instance.FQDN = strings.Join(values, ".")
 			break
 		}
 	}
