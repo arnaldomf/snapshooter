@@ -4,6 +4,9 @@ This programs schedules instances snapshots
 
 # configuration
 
+The credentials are expected to be exported as Environment Variables
+**AWS_SECRET_ACCESS_KEY** and **AWS_ACCESS_KEY_ID**
+
 The configuration file uses the toml format, and must have the fields:
 
 1. region (string) - aws region where the program will find the instances
