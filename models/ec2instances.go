@@ -12,7 +12,7 @@ type BlockMapping struct {
 type EC2Instance struct {
 	Name          string
 	ID            string
-	WindowHour    string
+	WindowHour    int
 	BlockMappings []*BlockMapping
 }
 
@@ -33,4 +33,8 @@ func GetEC2Instance(instance *ec2.Instance) *EC2Instance {
 		ec2Instance.BlockMappings = append(ec2Instance.BlockMappings, bm)
 	}
 	return ec2Instance
+}
+
+func (instance *EC2Instance) windowHour(hh int) {
+	instance.WindowHour = hh
 }
