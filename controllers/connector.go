@@ -20,6 +20,7 @@ type CreateConnectorInput struct {
 type Connector interface {
 	Connect() error
 	GetInstancesByName(names []*string) ([]models.Instance, error)
+	CreateSnapshot(instance models.Instance) error
 }
 
 func createAWSConnector(

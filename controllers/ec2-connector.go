@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	"bitbucket.org/dafiti/snap-shooter/models"
 	"github.com/aws/aws-sdk-go/aws"
@@ -53,4 +55,38 @@ func (ec2Connector *EC2Connector) GetInstancesByName(names []*string) ([]models.
 	}
 
 	return instances, nil
+}
+
+// CreateSnapshot creates a snapshot from an models.EC2Instance
+func (ec2Connector *EC2Connector) CreateSnapshot(instance models.Instance) error {
+	ec2inst, ok := instance.(*models.EC2Instance)
+	if !ok {
+		return errors.New("Instance is not from type *models.EC2Instance")
+	}
+	now := time.Now()
+	timeStr := fmt.Sprintf("%d-%d-%d", now.Year(), now.Month(), now.Day())
+	for _, volume := range ec2inst.BlockMappings {
+		name := fmt.Sprintf("%s:(%s)", ec2inst.Name, volume.Name)
+		description := fmt.Sprintf("%s: volume %s @%s", ec2inst.Name, volume.Name, timeStr)
+		snapshotInput := new(ec2.CreateSnapshotInput)
+		snapshotInput.VolumeId = aws.String(volume.ID)
+		snapshotInput.Description = aws.String(description)
+		snap, err := ec2Connector.ServiceConn.CreateSnapshot(snapshotInput)
+		if err != nil {
+			return err
+		}
+		createTagsInput := &ec2.CreateTagsInput{
+			Resources: []*string{snap.SnapshotId},
+			Tags: []*ec2.Tag{
+				&ec2.Tag{
+					Key:   aws.String("Name"),
+					Value: aws.String(name),
+				},
+			},
+		}
+		if _, err := ec2Connector.ServiceConn.CreateTags(createTagsInput); err != nil {
+			return err
+		}
+	}
+	return nil
 }
