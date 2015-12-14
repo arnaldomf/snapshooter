@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"bitbucket.org/dafiti/snap-shooter/connectors"
-	"bitbucket.org/dafiti/snap-shooter/models"
+	"github.com/dafiti/snapshooter/connectors"
+	"github.com/dafiti/snapshooter/models"
 )
 
 func main() {

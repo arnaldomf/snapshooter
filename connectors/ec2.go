@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"bitbucket.org/dafiti/snap-shooter/models"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/dafiti/snapshooter/models"
 )
 
 // EC2Connector handles the communication with AWS

@@ -1,4 +1,4 @@
-# snap-shooter
+# snapshooter
 
 This programs schedules instances snapshots
 

@@ -3,7 +3,7 @@ package configs_test
 import (
 	"fmt"
 
-	"bitbucket.org/dafiti/snap-shooter/configs"
+	"github.com/dafiti/snapshooter/configs"
 )
 
 func Example() {

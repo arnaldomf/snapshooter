@@ -3,7 +3,7 @@ package connectors
 import (
 	"fmt"
 
-	"bitbucket.org/dafiti/snap-shooter/models"
+	"github.com/dafiti/snapshooter/models"
 )
 
 const (
