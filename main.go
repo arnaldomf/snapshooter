@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 
-	"bitbucket.org/dafiti/snap-shooter/controllers"
+	"bitbucket.org/dafiti/snap-shooter/connectors"
 	"bitbucket.org/dafiti/snap-shooter/models"
 )
 
 func main() {
-	createInput := &controllers.CreateConnectorInput{CloudType: "aws", Region: "sa-east-1"}
-	conn, _ := controllers.CreateConnector(createInput)
+	createInput := &connectors.CreateConnectorInput{CloudType: "aws", Region: "sa-east-1"}
+	conn, _ := connectors.CreateConnector(createInput)
 	conn.Connect()
 	fmt.Println(conn)
 	name := "dft-sa-deploy01.aws.dafiticorp.com.br"
