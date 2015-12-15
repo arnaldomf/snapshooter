@@ -1,4 +1,6 @@
-# snapshooter
+# Snapshooter
+[![Build Status](https://img.shields.io/travis/dafiti/snapshooter/master.svg?style=flat-square)](https://travis-ci.org/dafiti/snapshooter)
+[![Coverage Status](https://img.shields.io/coveralls/dafiti/snapshooter/master.svg?style=flat-square)](https://coveralls.io/github/dafiti/snapshooter?branch=master)
 
 This programs schedules instances snapshots
 
