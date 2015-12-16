@@ -35,6 +35,9 @@ func (ec2Connector *EC2Connector) Connect() error {
 
 // GetInstancesByName returns EC2Instance with tag name
 func (ec2Connector *EC2Connector) GetInstancesByName(names []*string) ([]models.Instance, error) {
+	if !ec2Connector.ConnectionExists() {
+		return nil, errors.New("EC2Connector.GetInstanceByName: Didnt acquired connection")
+	}
 	describeInput := new(ec2.DescribeInstancesInput)
 	filter := new(ec2.Filter)
 	filter.Name = aws.String("tag:Name")
