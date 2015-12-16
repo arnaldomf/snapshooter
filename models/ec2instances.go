@@ -16,6 +16,7 @@ type EC2Instance struct {
 	FQDN          string
 	ID            string
 	WindowHour    int
+	Region        string
 	BlockMappings []*BlockMapping
 }
 

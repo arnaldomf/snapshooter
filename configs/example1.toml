@@ -6,3 +6,4 @@ region = "sa-east-1"
   [instances.instance2]
     domain = "dafiti.com.br"
     window_hour = "00"
+    region = "us-east-1"

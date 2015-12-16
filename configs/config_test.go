@@ -14,7 +14,8 @@ func Example() {
 	}
 	fmt.Println(config1.Region)
 	fmt.Printf("%s.%s\n", "instance1", config1.Instances["instance1"].Domain)
-	fmt.Printf("%s.%s\n", "instance2", config1.Instances["instance1"].Domain)
+	fmt.Printf("%s.%s\n", "instance2", config1.Instances["instance2"].Domain)
+	fmt.Printf("%s\n", config1.Instances["instance2"].Region)
 
 	configs.ClearConfig()
 
@@ -28,5 +29,6 @@ func Example() {
 	// sa-east-1
 	// instance1.dafiti.com.br
 	// instance2.dafiti.com.br
+	// us-east-1
 	// instance1: failed to parse window_hour
 }

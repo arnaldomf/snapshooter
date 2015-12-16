@@ -16,6 +16,7 @@ import (
 type Instance struct {
 	Domain     string `toml:"domain"`
 	WindowHour string `toml:"window_hour"`
+	Region     string `toml:"region"`
 }
 
 // Config struct represents the global configuration from config file
