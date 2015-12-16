@@ -15,7 +15,7 @@ type EC2Instance struct {
 	Domain        string
 	FQDN          string
 	ID            string
-	WindowHour    int
+	Hour          int
 	Region        string
 	BlockMappings []*BlockMapping
 }
@@ -43,5 +43,5 @@ func GetEC2Instance(instance *ec2.Instance) *EC2Instance {
 }
 
 func (instance *EC2Instance) windowHour(hh int) {
-	instance.WindowHour = hh
+	instance.Hour = hh
 }

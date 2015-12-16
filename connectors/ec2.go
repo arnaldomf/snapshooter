@@ -34,14 +34,20 @@ func (ec2Connector *EC2Connector) Connect() error {
 }
 
 // GetInstancesByName returns EC2Instance with tag name
-func (ec2Connector *EC2Connector) GetInstancesByName(names []*string) ([]models.Instance, error) {
+func (ec2Connector *EC2Connector) GetInstancesByName(gibni []*GetInstanceByNameInput) ([]models.Instance, error) {
 	if !ec2Connector.ConnectionExists() {
 		return nil, errors.New("EC2Connector.GetInstanceByName: Didnt acquired connection")
 	}
 	describeInput := new(ec2.DescribeInstancesInput)
 	filter := new(ec2.Filter)
 	filter.Name = aws.String("tag:Name")
-	filter.Values = names
+	filter.Values = func() []*string {
+		var names []*string
+		for _, v := range gibni {
+			names = append(names, aws.String(v.Name))
+		}
+		return names
+	}()
 	describeInput.Filters = append(describeInput.Filters, filter)
 	describeOutput, err := ec2Connector.ServiceConn.DescribeInstances(describeInput)
 	if err != nil {
@@ -92,4 +98,38 @@ func (ec2Connector *EC2Connector) CreateSnapshot(instance models.Instance) error
 		}
 	}
 	return nil
+}
+
+// GetInstanceByName returns EC2Instance with tag name
+func (ec2Connector *EC2Connector) GetInstanceByName(gibni *GetInstanceByNameInput) (models.Instance, error) {
+	if !ec2Connector.ConnectionExists() {
+		return nil, errors.New("EC2Connector.GetInstanceByName: Didnt acquired connection")
+	}
+	describeInput := new(ec2.DescribeInstancesInput)
+	filter := new(ec2.Filter)
+	filter.Name = aws.String("tag:Name")
+	filter.Values = []*string{aws.String(gibni.Name)}
+	describeInput.Filters = append(describeInput.Filters, filter)
+	describeOutput, err := ec2Connector.ServiceConn.DescribeInstances(describeInput)
+	if err != nil {
+		return nil, err
+	}
+	if len(describeOutput.Reservations) == 0 {
+		return nil, errors.New("Instance not found")
+	}
+	instanceResult := new(models.EC2Instance)
+RESERVATION_LOOP:
+	for _, reservation := range describeOutput.Reservations {
+		for _, instance := range reservation.Instances {
+			instanceResult = models.GetEC2Instance(instance)
+			instanceResult.Region = gibni.Region
+			err := models.SetWindowHour(instanceResult, gibni.WindowHour)
+			if err != nil {
+				return nil, err
+			}
+			break RESERVATION_LOOP
+		}
+	}
+
+	return instanceResult, nil
 }

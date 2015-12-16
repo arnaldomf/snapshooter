@@ -19,7 +19,8 @@ type CreateConnectorInput struct {
 // Connector abstract all other connectors
 type Connector interface {
 	Connect() error
-	GetInstancesByName(names []*string) ([]models.Instance, error)
+	GetInstancesByName(gibni []*GetInstanceByNameInput) ([]models.Instance, error)
+	GetInstanceByName(gibni *GetInstanceByNameInput) (models.Instance, error)
 	CreateSnapshot(instance models.Instance) error
 }
 
@@ -42,4 +43,11 @@ func CreateConnector(createConnectorInput *CreateConnectorInput) (Connector, err
 			errorTag, createConnectorInput.CloudType)
 	}
 	return connector, nil
+}
+
+// GetInstanceByNameInput packs information needed to fetch an instance on cloud provider
+type GetInstanceByNameInput struct {
+	Name       string
+	Region     string
+	WindowHour int
 }

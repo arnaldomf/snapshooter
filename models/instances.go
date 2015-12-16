@@ -1,9 +1,6 @@
 package models
 
-import (
-	"errors"
-	"strconv"
-)
+import "errors"
 
 // Instance is an interface to cloud Instances
 type Instance interface {
@@ -11,15 +8,17 @@ type Instance interface {
 }
 
 // SetWindowHour validates the window_hour attribute and parses it to int
-func SetWindowHour(instance Instance, hour string) error {
-	hh, err := strconv.Atoi(hour)
-	if err != nil {
-		return err
-	}
-	if hh < 0 || hh > 23 {
+func SetWindowHour(instance Instance, hour int) error {
+	if hour < 0 || hour > 23 {
 		return errors.New("WindowHour is not valid")
 	}
-	instance.windowHour(hh)
+	instance.windowHour(hour)
 
 	return nil
+}
+
+// GetInstanceInput packs all input information needed to create an abstract instance
+type GetInstanceInput struct {
+	Region     string
+	WindowHour int
 }
