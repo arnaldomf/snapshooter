@@ -1,5 +1,0 @@
-region = "sa-east-1"
-[instances]
-  [instances.instance1]
-    domain = "dafiti.com.br"
-    window_hour = "24"
