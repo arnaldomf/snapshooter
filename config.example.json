@@ -1,0 +1,12 @@
+{
+    "digital_ocean": {
+        "auth_token": "YOUR TOKEN",
+        "droplets": [
+            {
+                "id": 1,
+                "name": "Goku",
+                "window_hour": 0
+            }
+        ]
+    }
+}
