@@ -6,6 +6,7 @@ import (
 
 const (
 	DIGITAL_OCEAN string = "digital_ocean"
+	EC2           string = "ec2"
 )
 
 type Instance interface {
