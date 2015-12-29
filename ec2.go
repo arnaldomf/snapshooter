@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -14,10 +17,10 @@ type AWS struct {
 }
 
 // GetEC2InstanceByName will gather information from ec2Instances to fetch it from aws
-func (a *AWS) GetEC2InstanceByName(idx int, ec2Instances *j.Json) *EC2Instance {
-	name, _ := ec2Instances.GetIndex(idx).Get("name").String()
-	windowHour, _ := ec2Instances.GetIndex(idx).Get("window_hour").Int()
-	region, _ := ec2Instances.GetIndex(idx).Get("region").String()
+func (a *AWS) GetEC2InstanceByName(idx int) *EC2Instance {
+	name, _ := a.config.GetIndex(idx).Get("name").String()
+	windowHour, _ := a.config.GetIndex(idx).Get("window_hour").Int()
+	region, _ := a.config.GetIndex(idx).Get("region").String()
 	describeInstancesInput := &ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			&ec2.Filter{
@@ -28,6 +31,7 @@ func (a *AWS) GetEC2InstanceByName(idx int, ec2Instances *j.Json) *EC2Instance {
 	}
 
 	describeOutput, err := a.Client(region).DescribeInstances(describeInstancesInput)
+
 	if err != nil {
 		return nil
 	}
@@ -40,6 +44,7 @@ func (a *AWS) GetEC2InstanceByName(idx int, ec2Instances *j.Json) *EC2Instance {
 	ec2Instance.name = name
 	ec2Instance.windowHour = windowHour
 	ec2Instance.id = *reservations[0].Instances[0].InstanceId
+	ec2Instance.svc = a.Client(region)
 	ec2Instance.setBlockDevices(reservations[0].Instances[0])
 	return ec2Instance
 }
@@ -59,14 +64,8 @@ func (a *AWS) Client(region string) *ec2.EC2 {
 func (a *AWS) GetInstances() []Instance {
 	var instances []Instance
 
-	if _, ok := a.config.CheckGet("ec2"); ok == false {
-		return instances
-	}
-
-	ec2Instances := a.config.Get("ec2")
-
-	for idx := range ec2Instances.MustArray() {
-		instances = append(instances, a.GetEC2InstanceByName(idx, ec2Instances))
+	for idx := range a.config.MustArray() {
+		instances = append(instances, a.GetEC2InstanceByName(idx))
 	}
 
 	return instances
@@ -84,6 +83,7 @@ type EC2Instance struct {
 	id           string
 	windowHour   int
 	blockdevices []*EC2BlockDevice
+	svc          *ec2.EC2
 }
 
 func (ec2Instance *EC2Instance) setBlockDevices(instance *ec2.Instance) {
@@ -95,7 +95,23 @@ func (ec2Instance *EC2Instance) setBlockDevices(instance *ec2.Instance) {
 	}
 }
 
-// Snapshot creates an snapshot from the receiver instance
+// Snapshot creates an snapshot from the receiver instance. It will create a
+// new snapshot for each volume attached to the instance
 func (ec2Instance *EC2Instance) Snapshot() bool {
-	return false
+	if len(ec2Instance.blockdevices) == 0 {
+		return false
+	}
+	now := time.Now().Format("2006-01-02")
+	for _, volume := range ec2Instance.blockdevices {
+		description := fmt.Sprintf("%s:(%s) @%s", ec2Instance.name, volume.Name, now)
+		params := &ec2.CreateSnapshotInput{
+			VolumeId:    aws.String(volume.ID),
+			Description: aws.String(description),
+		}
+		_, err := ec2Instance.svc.CreateSnapshot(params)
+		if err != nil {
+			return false
+		}
+	}
+	return true
 }
