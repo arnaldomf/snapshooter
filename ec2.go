@@ -56,8 +56,8 @@ func (a *AWS) Client(region string) *ec2.EC2 {
 }
 
 // GetInstances returns a slice of EC2Instances found on aws based on the config file
-func (a *AWS) GetInstances() []*EC2Instance {
-	var instances []*EC2Instance
+func (a *AWS) GetInstances() []Instance {
+	var instances []Instance
 
 	if _, ok := a.config.CheckGet("ec2"); ok == false {
 		return instances
@@ -93,4 +93,9 @@ func (ec2Instance *EC2Instance) setBlockDevices(instance *ec2.Instance) {
 		ec2Block.ID = *blockDevice.Ebs.VolumeId
 		ec2Instance.blockdevices = append(ec2Instance.blockdevices, ec2Block)
 	}
+}
+
+// Snapshot creates an snapshot from the receiver instance
+func (ec2Instance *EC2Instance) Snapshot() bool {
+	return false
 }
