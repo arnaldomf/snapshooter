@@ -24,6 +24,10 @@ func (s *Snapshooter) Start() []Instance {
 
 		s.instances = append(s.instances, do.GetInstances()...)
 	}
+	if _, ok := s.config.CheckGet(EC2); ok {
+		ec2 := &AWS{config: s.config.Get(EC2)}
+		s.instances = append(s.instances, ec2.GetInstances()...)
+	}
 
 	return s.instances
 }
