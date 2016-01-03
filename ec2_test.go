@@ -6,7 +6,7 @@ import (
 	"github.com/bitly/go-simplejson"
 )
 
-func TestIFEC2ClientIsNotNil(t *testing.T) {
+func TestIfEC2ClientIsNotNil(t *testing.T) {
 	awsConn := new(AWS)
 	client := awsConn.Client("us-east-1")
 	if client == nil {
@@ -18,8 +18,9 @@ func TestEC2GetInstancesWithNoInstance(t *testing.T) {
 	awsConn := new(AWS)
 	config, _ := simplejson.NewJson([]byte(`{}`))
 	awsConn.config = config
-	if awsConn.GetInstances() != nil {
-		t.Error("Expected nil")
+	instances := awsConn.GetInstances()
+	if instances != nil {
+		t.Error("Expected nil, received", instances)
 	}
 }
 
@@ -30,7 +31,7 @@ func TestEC2GetInstancesWithInstanceNotFound(t *testing.T) {
     }`))
 	awsConn.config = config
 	instances := awsConn.GetInstances()
-	if instances == nil {
+	if instances != nil {
 		t.Error("Expected [], received", instances)
 	}
 }
