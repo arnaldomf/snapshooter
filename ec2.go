@@ -16,11 +16,11 @@ type AWS struct {
 	clientRegion map[string]*ec2.EC2
 }
 
-// GetEC2InstanceByName will gather information from ec2Instances to fetch it from aws
-func (a *AWS) GetEC2InstanceByName(idx int) *EC2Instance {
-	name, _ := a.config.GetIndex(idx).Get("name").String()
-	windowHour, _ := a.config.GetIndex(idx).Get("window_hour").Int()
-	region, _ := a.config.GetIndex(idx).Get("region").String()
+// CreateEC2Instance will gather information from ec2Instances to fetch it from aws
+func (a *AWS) CreateEC2Instance(config *j.Json) *EC2Instance {
+	name, _ := config.Get("name").String()
+	windowHour, _ := config.Get("window_hour").Int()
+	region, _ := config.Get("region").String()
 	describeInstancesInput := &ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			&ec2.Filter{
@@ -63,9 +63,13 @@ func (a *AWS) Client(region string) *ec2.EC2 {
 // GetInstances returns a slice of EC2Instances found on aws based on the config file
 func (a *AWS) GetInstances() []Instance {
 	var instances []Instance
-
-	for idx := range a.config.MustArray() {
-		instances = append(instances, a.GetEC2InstanceByName(idx))
+	var tmpInstance *EC2Instance
+	configInstances := a.config.Get(EC2)
+	for idx := range configInstances.MustArray() {
+		item := configInstances.GetIndex(idx)
+		if tmpInstance = a.CreateEC2Instance(item); tmpInstance != nil {
+			instances = append(instances, tmpInstance)
+		}
 	}
 
 	return instances
